@@ -1,0 +1,31 @@
+version: "3" 
+services:
+  web_beginingrails62:
+    image: alexrogna/beginingrails62_web:prod
+    expose:
+      - 3000
+    env_file:
+      - .env/production/database_beginingrails62
+      - .env/production/web_beginingrails62
+    environment:
+      - VIRTUAL_HOST=beginingrails62.alexrogna.com
+      - VIRTUAL_PORT=3000
+      - LETSENCRYPT_HOST=beginingrails62.alexrogna.com
+    restart: always
+
+  database_beginingrails62:
+    image: postgres
+    env_file:
+      - .env/production/database_beginingrails62
+    volumes:
+      - db_data_beginingrails62:/var/lib/postgresql/data
+    restart: always
+    
+  db-migrator_beginingrails62:
+    image: alexrogna/beginingrails62_web:prod
+    command: ["./wait-for", "--timeout=300", "database_beginingrails62:5432", "--", "bin/rails", "db:create" , "db:migrate"]
+    env_file:
+      - .env/production/database_beginingrails62
+      - .env/production/web_beginingrails62
+volumes:
+  db_data_beginingrails62:
